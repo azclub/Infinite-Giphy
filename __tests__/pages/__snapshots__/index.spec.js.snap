@@ -1,0 +1,40 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`App Snapshot Testing renders loading state 1`] = `
+<div>
+  <div
+    className="giphy giphy--three-column"
+  >
+    <div
+      className="giphy__filter"
+    >
+      <h1
+        className="filter__title"
+      >
+        Loading...
+      </h1>
+      <input
+        className="filter__input"
+        onChange={[Function]}
+        placeholder="Search GIFs by Keywords (e.g puns, kittens, dogs, etc...)"
+        tabIndex="0"
+        type="text"
+      />
+      <button
+        className="giphy__column-toggle"
+        onClick={[Function]}
+      >
+        Toggle Column
+      </button>
+    </div>
+    <div
+      className="giphy__result--loading"
+    >
+      <img
+        alt="Loading"
+        src="/images/loading.svg"
+      />
+    </div>
+  </div>
+</div>
+`;

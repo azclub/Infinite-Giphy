@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Gif renders component with image data 1`] = `
+<picture
+  className="giphy__gif"
+>
+  <source
+    srcSet="https://media1.giphy.com/media/Qem49y6xGw57W/giphy.webp?cid=18ba804ef5184d09da45836fd662f765ca0cd75cf97af788&rid=giphy.webp"
+    type="image/webp"
+  />
+  <source
+    media="(max-width: 680px)"
+    srcSet="https://media1.giphy.com/media/Qem49y6xGw57W/giphy-downsized-medium.gif?cid=18ba804ef5184d09da45836fd662f765ca0cd75cf97af788&rid=giphy-downsized-medium.gif"
+  />
+  <img
+    height="465"
+    src="https://media1.giphy.com/media/Qem49y6xGw57W/giphy.gif?cid=18ba804ef5184d09da45836fd662f765ca0cd75cf97af788&rid=giphy.gif"
+    width="478"
+  />
+</picture>
+`;

@@ -1,88 +1,102 @@
 import React from 'react'
 import Head from 'next/head'
-import Nav from '../components/nav'
+import Panel from '../components/panel'
+import { fetchGifs } from '../libs/gifphy'
+import { debounce } from 'lodash';
+import '../styles/main.scss'
 
-const Home = () => (
-  <div>
-    <Head>
-      <title>Home</title>
-      <link rel="icon" href="/favicon.ico" />
-    </Head>
+class App extends React.Component {
+  state = {
+    images: [],
+    query: 'pun',
+    loading: false,
+    error: false,
+    column: 3,
+  }
 
-    <Nav />
+  handelInfiniteScroll = debounce(() => {
+    if(window.innerHeight + window.scrollY >= document.body.offsetHeight * 0.8) {
+      const { images, query } = this.state
+      this.fetchGifs({ offset: images.length, query })
+    }
+  }, 500)
 
-    <div className="hero">
-      <h1 className="title">Welcome to Next.js!</h1>
-      <p className="description">
-        To get started, edit <code>pages/index.js</code> and save to reload.
-      </p>
+  fetchGifs = async (params = {}) => {
+    this.setState({ error: false })
 
-      <div className="row">
-        <a href="https://nextjs.org/docs" className="card">
-          <h3>Documentation &rarr;</h3>
-          <p>Learn more about Next.js in the documentation.</p>
-        </a>
-        <a href="https://nextjs.org/learn" className="card">
-          <h3>Next.js Learn &rarr;</h3>
-          <p>Learn about Next.js by following an interactive tutorial!</p>
-        </a>
-        <a
-          href="https://github.com/zeit/next.js/tree/master/examples"
-          className="card"
-        >
-          <h3>Examples &rarr;</h3>
-          <p>Find other example boilerplates on the Next.js GitHub.</p>
-        </a>
+    const mergedParams = {
+      query: this.state.query,
+      ...params
+    }
+    
+    this.setState({loading: true})
+    try {
+      const newImages = await fetchGifs(mergedParams)
+      this.setState({ images: [...this.state.images, ...newImages]})
+    } catch (e) {
+      console.log(e)
+      this.setState({ error: e })
+    } finally {
+      this.setState({ loading: false })
+    }
+  }
+
+  resetAndFetchGifs = debounce((query) => {
+    this.setState({ 
+      images: [],
+      query
+    })
+
+    this.fetchGifs({ query })
+  }, 500)
+
+  onChange = (e) => {
+    e.persist()
+    this.resetAndFetchGifs(e.target.value)
+  }
+
+  toggleColumns = () => {
+    const { column } = this.state
+    this.setState({ column: column == 3 ? 1 : 3 })
+  }
+
+  componentDidMount () {
+    window.addEventListener('scroll', this.handelInfiniteScroll, { passive: true })
+    this.fetchGifs()
+  }
+
+  render() {
+    const { query, images, loading, error } = this.state
+  
+    return( <div>
+      <Head>
+        <title>Infinite GIFs!</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+  
+      <div className={`giphy ${this.state.column == 3 ? 'giphy--three-column' : ''}`}>
+        <div className="giphy__filter">
+          <h1 className="filter__title">
+            {loading ? 'Loading...': 'Infinite GIFs!'}
+          </h1>
+
+          <input 
+            tabIndex="0" type="text" className="filter__input" onChange={this.onChange} 
+            placeholder="Search GIFs by Keywords (e.g puns, kittens, dogs, etc...)"/>
+
+          <button className="giphy__column-toggle" onClick={this.toggleColumns}>
+            Toggle Column
+          </button>
+        </div>
+
+        <Panel 
+          images={images} 
+          error={error} 
+          errorRetry={this.fetchGifs}
+        />
       </div>
-    </div>
+    </div>)
+  }
+}
 
-    <style jsx>{`
-      .hero {
-        width: 100%;
-        color: #333;
-      }
-      .title {
-        margin: 0;
-        width: 100%;
-        padding-top: 80px;
-        line-height: 1.15;
-        font-size: 48px;
-      }
-      .title,
-      .description {
-        text-align: center;
-      }
-      .row {
-        max-width: 880px;
-        margin: 80px auto 40px;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-      }
-      .card {
-        padding: 18px 18px 24px;
-        width: 220px;
-        text-align: left;
-        text-decoration: none;
-        color: #434343;
-        border: 1px solid #9b9b9b;
-      }
-      .card:hover {
-        border-color: #067df7;
-      }
-      .card h3 {
-        margin: 0;
-        color: #067df7;
-        font-size: 18px;
-      }
-      .card p {
-        margin: 0;
-        padding: 12px 0 0;
-        font-size: 13px;
-        color: #333;
-      }
-    `}</style>
-  </div>
-)
-
-export default Home
+export default App
